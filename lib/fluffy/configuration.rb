@@ -1,5 +1,11 @@
 require 'forwardable'
 
+require 'fluffy/codecs/json'
+require 'fluffy/codecs/noop'
+
+require 'fluffy/processor'
+require 'fluffy/handlers/default_handler'
+
 module Fluffy
   class Configuration
     extend Forwardable
@@ -33,9 +39,28 @@ module Fluffy
       :queue_options      => QUEUE_OPTION_DEFAULTS,
       :concurrency        => 1,
       :ack                => true,
+      :handler_class      => Fluffy::Handlers::DefaultHandler,
+      :handler_options    => {},
+      :codec              => Fluffy::Codecs::JSON,
+      :processors         => [],
       :pidfile            => nil,
       :require            => '.'
     }
+
+    # processor example
+    # @processor            Processor class
+    # @workers              array of worker classes
+    # @connection           connection params if using separate connection
+    # {
+    #   :processor          => Processor,
+    #   :connection_options => {},
+    #   :workers            => [],
+    #   :concurrency        => 1,
+    #   :ack                => true,
+    #   :handler_class      => nil,
+    #   :handler_options    => nil,
+    #   :codec              => Fluffy::Codecs::JSON
+    # }
 
     def initialize
       @config = DEFAULT_CONFIG.dup
@@ -55,6 +80,17 @@ module Fluffy
     def deep_merge(first, second)
       merger = proc { |_, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
       first.merge(second, &merger)
+    end
+
+    def processor(opts = {})
+      {
+        :processor        => Fluffy::Processor,
+        :workers          => []
+      }.merge(opts)
+    end
+
+    def add_processor(opts = {})
+      @config[:processors] << processor(opts)
     end
 
   end
