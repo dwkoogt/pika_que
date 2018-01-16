@@ -5,6 +5,8 @@ require 'fluffy/version'
 
 require 'fluffy/connection'
 require 'fluffy/publisher'
+require 'fluffy/middleware/chain'
+
 module Fluffy
 
   def self.config
@@ -22,5 +24,12 @@ module Fluffy
   def self.connection
     @connection ||= Connection.create
   end
+
+  def self.middleware
+    @chain ||= Middleware::Chain.new
+    yield @chain if block_given?
+    @chain
+  end
+
 
 end

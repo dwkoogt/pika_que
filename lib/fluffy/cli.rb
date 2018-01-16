@@ -19,6 +19,8 @@ module Fluffy
 
     def run
 
+      Fluffy.middleware
+
       runner = Runner.new
 
       begin
