@@ -19,6 +19,8 @@ module Fluffy
 
     def run
 
+      load_app
+
       Fluffy.middleware
 
       runner = Runner.new
@@ -83,6 +85,27 @@ module Fluffy
           f.puts ::Process.pid
         end
       end
+    end
+
+    def load_app
+      if File.directory?(config[:require])
+        rails_path = File.expand_path(File.join(config[:require], 'config/environment.rb'))
+        if File.exist?(rails_path)
+          ENV['RACK_ENV'] = ENV['RAILS_ENV'] = environment
+          Fluffy.logger.info "found rails project (#{config[:require]}), booting app in #{ENV['RACK_ENV']} environment"
+          require 'rails'
+          require 'fluffy/rails'
+          require rails_path
+          ::Rails.application.eager_load!
+        end
+      else
+        require(File.expand_path(config[:require])) || raise(ArgumentError, 'require returned false')
+      end
+
+      if config[:workers]
+        config.add_processor({ workers: config.delete(:workers) })
+      end
+
     end
 
     def parse_options(args)
