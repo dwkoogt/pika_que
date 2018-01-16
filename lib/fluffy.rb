@@ -1,5 +1,14 @@
-require "fluffy/version"
+require 'fluffy/logging'
+require 'fluffy/version'
 
 module Fluffy
-  # Your code goes here...
+
+  def self.logger
+    Fluffy::Logging.logger
+  end
+
+  def self.logger=(logger)
+    Fluffy::Logging.logger = logger
+  end
+
 end
