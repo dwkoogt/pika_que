@@ -1,7 +1,12 @@
+require 'fluffy/configuration'
 require 'fluffy/logging'
 require 'fluffy/version'
 
 module Fluffy
+
+  def self.config
+    @config ||= Configuration.new
+  end
 
   def self.logger
     Fluffy::Logging.logger
