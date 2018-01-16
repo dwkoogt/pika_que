@@ -1,3 +1,8 @@
 #!/usr/bin/env ruby
 
 require "fluffy"
+require "fluffy/cli"
+
+cli = Fluffy::CLI.new
+cli.parse
+cli.run
