@@ -1,4 +1,6 @@
 require 'bunny'
+require 'concurrent/executors'
+
 require 'fluffy/configuration'
 require 'fluffy/logging'
 require 'fluffy/version'
