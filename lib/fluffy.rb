@@ -4,6 +4,7 @@ require 'fluffy/logging'
 require 'fluffy/version'
 
 require 'fluffy/connection'
+require 'fluffy/publisher'
 module Fluffy
 
   def self.config
