@@ -74,9 +74,9 @@ module Fluffy
       alias_method :perform_async, :enqueue
 
       def enqueue_at(msg, timestamp, opts={})
-        opts[:routing_key] ||= queue_opts[:routing_key]
         opts[:to_queue] ||= 'fluffy-delay'
-        opts[:headers] = { work_at: timestamp, work_queue: @queue_name }
+        work_queue = opts.delete(:routing_key) || queue_opts[:routing_key] || queue_name
+        opts[:headers] = { work_at: timestamp, work_queue: work_queue }
 
         publisher.publish(msg, opts)
       end
