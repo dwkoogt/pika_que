@@ -6,7 +6,7 @@ module Fluffy
       extend self
 
       def encode(payload)
-        ::JSON.generate(payload)
+        ::JSON.generate(payload, quirks_mode: true)
       end
 
       def decode(payload)
