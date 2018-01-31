@@ -1,4 +1,5 @@
 require 'fluffy'
+require 'fluffy/codecs/rails'
 require 'thread'
 
 module ActiveJob
@@ -19,19 +20,20 @@ module ActiveJob
       class << self
         def enqueue(job) #:nodoc:
           @monitor.synchronize do
-            JobWrapper.enqueue ActiveSupport::JSON.encode(job.serialize), to_queue: job.queue_name
+            JobWrapper.enqueue job.serialize, to_queue: job.queue_name
           end
         end
 
         def enqueue_at(job, timestamp) #:nodoc:
           @monitor.synchronize do
-            JobWrapper.enqueue_at ActiveSupport::JSON.encode(job.serialize), timestamp, routing_key: job.queue_name
+            JobWrapper.enqueue_at job.serialize, timestamp, routing_key: job.queue_name
           end
         end
       end
 
       class JobWrapper #:nodoc:
         extend Fluffy::Worker::ClassMethods
+        config codec: Fluffy::Codecs::RAILS
       end
     end
 

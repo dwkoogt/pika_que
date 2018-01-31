@@ -37,10 +37,10 @@ module Fluffy
           Object.const_set(worker_name, Class.new do
               include Fluffy::Worker
               from_queue queue
+              config codec: Fluffy::Codecs::RAILS
 
               def perform(msg)
-                job_data = ActiveSupport::JSON.decode(msg)
-                ActiveJob::Base.execute job_data
+                ActiveJob::Base.execute msg
                 ack!
               end
             end
