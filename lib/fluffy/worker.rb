@@ -52,6 +52,7 @@ module Fluffy
       attr_reader :handler_class
       attr_reader :handler_opts
       attr_reader :priority
+      attr_reader :config
 
       def from_queue(q, opts={})
         @queue_name = q.to_s
@@ -82,10 +83,14 @@ module Fluffy
       end
       alias_method :perform_at, :enqueue
 
+      def config(opts={})
+        @config = opts
+      end
+
       private
 
       def publisher
-        @publisher ||= Fluffy::Publisher.new
+        @publisher ||= Fluffy::Publisher.new(config || {})
       end
 
     end
