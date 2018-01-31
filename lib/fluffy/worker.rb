@@ -85,7 +85,7 @@ module Fluffy
       private
 
       def publisher
-        @publisher ||= Fluffy::Publisher.new(queue_opts || Fluffy.config[:queue_options])
+        @publisher ||= Fluffy::Publisher.new
       end
 
     end
