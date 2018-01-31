@@ -73,7 +73,7 @@ module Fluffy
         end
         io.sync = true
       end
-      $stdin.reopen('/dev/null')
+      $stdin.reopen(File::NULL)
 
       init_logger
     end
@@ -89,7 +89,7 @@ module Fluffy
 
     def load_app
       if File.directory?(config[:require])
-        rails_path = File.expand_path(File.join(config[:require], 'config/environment.rb'))
+        rails_path = File.expand_path(File.join(config[:require], 'config', 'environment.rb'))
         if File.exist?(rails_path)
           ENV['RACK_ENV'] = ENV['RAILS_ENV'] = environment
           Fluffy.logger.info "found rails project (#{config[:require]}), booting app in #{ENV['RACK_ENV']} environment"

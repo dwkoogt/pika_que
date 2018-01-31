@@ -8,6 +8,7 @@ require 'fluffy/version'
 require 'fluffy/connection'
 require 'fluffy/publisher'
 require 'fluffy/middleware/chain'
+require 'fluffy/worker'
 
 module Fluffy
 
@@ -32,6 +33,5 @@ module Fluffy
     yield @chain if block_given?
     @chain
   end
-
 
 end
