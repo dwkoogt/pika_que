@@ -65,7 +65,7 @@ module Fluffy
       end
 
       def enqueue(msg, opts={})
-        opts[:routing_key] ||= queue_opts[:routing_key]
+        opts[:routing_key] ||= (queue_opts[:routing_key] if queue_opts)
         opts[:to_queue] ||= queue_name
         opts[:priority] ||= priority
 
@@ -75,7 +75,7 @@ module Fluffy
 
       def enqueue_at(msg, timestamp, opts={})
         opts[:to_queue] ||= 'fluffy-delay'
-        work_queue = opts.delete(:routing_key) || queue_opts[:routing_key] || queue_name
+        work_queue = opts.delete(:routing_key) || (queue_opts[:routing_key] if queue_opts) || queue_name
         opts[:headers] = { work_at: timestamp, work_queue: work_queue }
 
         publisher.publish(msg, opts)
@@ -85,7 +85,7 @@ module Fluffy
       private
 
       def publisher
-        @publisher ||= Fluffy::Publisher.new(queue_opts)
+        @publisher ||= Fluffy::Publisher.new(queue_opts || Fluffy.config[:queue_options])
       end
 
     end
