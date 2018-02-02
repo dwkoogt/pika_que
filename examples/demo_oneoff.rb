@@ -4,6 +4,8 @@ require 'fluffy'
 
 require 'dev_worker'
 
+Fluffy.logger.level = ::Logger::DEBUG
+
 begin
   pro = DevWorker.new(concurrency: 2)
   pro.start

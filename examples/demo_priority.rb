@@ -2,6 +2,8 @@
 require 'fluffy'
 require 'fluffy/worker'
 
+Fluffy.logger.level = ::Logger::DEBUG
+
 class HighPriorityWorker
   include Fluffy::Worker
   from_queue "fluffy-priority", :arguments => { :'x-max-priority' => 10 }, :priority => 10

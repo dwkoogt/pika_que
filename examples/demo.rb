@@ -8,6 +8,8 @@ require 'dev_worker'
 require 'demo_worker'
 require 'demo_reporter'
 
+Fluffy.logger.level = ::Logger::DEBUG
+
 Fluffy.middleware do |chain|
   chain.add DemoReporter
 end
