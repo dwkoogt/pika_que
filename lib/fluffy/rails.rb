@@ -1,4 +1,5 @@
 require 'fluffy/worker'
+require 'fluffy/codecs/rails'
 
 module Fluffy
   class Rails < ::Rails::Engine
@@ -33,7 +34,7 @@ module Fluffy
         workers = []
         processor['workers'].each do |worker|
           queue = worker['queue']
-          worker_name = "#{queue.classify}Worker"
+          worker_name = worker['worker'] || "#{queue.classify}Worker"
           Object.const_set(worker_name, Class.new do
               include Fluffy::Worker
               from_queue queue
@@ -47,7 +48,9 @@ module Fluffy
           ) unless worker_files.detect{ |w| w =~ /#{worker_name.snakecase}/ }
           workers << worker_name
         end
-        Fluffy.config.add_processor(workers: workers)
+        proc_args = { workers: workers }
+        proc_args[:processor] = processor['processor'] if processor['processor']
+        Fluffy.config.add_processor(proc_args)
       end
     end
 
