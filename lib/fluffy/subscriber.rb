@@ -1,6 +1,9 @@
+require 'fluffy/reporters'
+
 module Fluffy
   class Subscriber
     include Logging
+    include Reporters
 
     attr_accessor :broker, :pool, :queue, :handler
 
@@ -30,16 +33,20 @@ module Fluffy
             Fluffy.middleware.invoke(self, delivery_info, metadata, decoded_msg) do
               res = worker.work(delivery_info, metadata, decoded_msg)
             end
-            logger.info "done processing #{res} <#{msg}>"
-          rescue => e
+            logger.debug "done processing #{res} <#{msg}>"
+          rescue => worker_err
             res = :error
-            error = e
-            logger.info "error processing <#{msg}>"
-            logger.error e
-            logger.error e.backtrace.join("\n") unless e.backtrace.nil?
+            error = worker_err
+            notify_reporters(worker_err, worker.class, msg)
           end
 
-          handler.handle(res, queue.channel, delivery_info, metadata, msg, error) if @opts[:ack]
+          if @opts[:ack]
+            begin
+              handler.handle(res, queue.channel, delivery_info, metadata, msg, error) 
+            rescue => handler_err
+              notify_reporters(handler_err, handler.class, msg)
+            end
+          end
         end
       end
     end

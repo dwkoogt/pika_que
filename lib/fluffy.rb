@@ -7,6 +7,7 @@ require 'fluffy/version'
 
 require 'fluffy/connection'
 require 'fluffy/publisher'
+require 'fluffy/reporters/log_reporter'
 require 'fluffy/middleware/chain'
 require 'fluffy/worker'
 
@@ -32,6 +33,11 @@ module Fluffy
     @chain ||= Middleware::Chain.new
     yield @chain if block_given?
     @chain
+  end
+
+  def self.reporters
+    config[:reporters] << Fluffy::Reporters::LogReporter.new if config[:reporters].empty?
+    config[:reporters]
   end
 
 end

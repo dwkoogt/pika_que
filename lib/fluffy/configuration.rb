@@ -43,6 +43,7 @@ module Fluffy
       :handler_options    => {},
       :codec              => Fluffy::Codecs::JSON,
       :processors         => [],
+      :reporters          => [],
       :pidfile            => nil,
       :require            => '.'
     }
