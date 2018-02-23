@@ -13,6 +13,10 @@ module Fluffy
       end
     end
 
+    config.before_initialize do
+      require 'active_job/queue_adapters/fluffy_adapter'
+    end
+
     config.after_initialize do
       config_file = Rails.root.join('config').join('fluffy.yml')
       if File.exist? config_file
