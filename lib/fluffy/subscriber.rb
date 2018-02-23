@@ -1,9 +1,11 @@
 require 'fluffy/reporters'
+require 'fluffy/metrics'
 
 module Fluffy
   class Subscriber
     include Logging
     include Reporters
+    include Metrics
 
     attr_accessor :broker, :pool, :queue, :handler
 
@@ -30,8 +32,10 @@ module Fluffy
           error = nil
           begin
             decoded_msg = @codec.decode(msg)
-            Fluffy.middleware.invoke(self, delivery_info, metadata, decoded_msg) do
-              res = worker.work(delivery_info, metadata, decoded_msg)
+            metrics.measure("work.#{self.class.name}.time") do
+              Fluffy.middleware.invoke(self, delivery_info, metadata, decoded_msg) do
+                res = worker.work(delivery_info, metadata, decoded_msg)
+              end
             end
             logger.debug "done processing #{res} <#{msg}>"
           rescue => worker_err
@@ -42,11 +46,16 @@ module Fluffy
 
           if @opts[:ack]
             begin
-              handler.handle(res, queue.channel, delivery_info, metadata, msg, error) 
+              handler.handle(res, broker.channel, delivery_info, metadata, msg, error)
+              metrics.increment("work.#{self.class.name}.handled.#{res}") 
             rescue => handler_err
               notify_reporters(handler_err, handler.class, msg)
+              metrics.increment("work.#{self.class.name}.handler.error") 
             end
+          else
+            metrics.increment("work.#{self.class.name}.handled.noop") 
           end
+          metrics.increment("work.#{self.class.name}.processed")
         end
       end
     end

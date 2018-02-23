@@ -44,6 +44,7 @@ module Fluffy
       :codec              => Fluffy::Codecs::JSON,
       :processors         => [],
       :reporters          => [],
+      :metrics            => nil,
       :pidfile            => nil,
       :require            => '.'
     }
