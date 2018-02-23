@@ -24,14 +24,19 @@ module Fluffy
     end
 
     def queue(queue_name, queue_opts)
-      queue = channel.queue(queue_name, queue_opts)
-      routing_key = queue_opts[:routing_key] || queue_name
-      routing_keys = [routing_key, *queue_opts[:routing_keys]]
+      begin
+        queue = channel.queue(queue_name, queue_opts)
+        routing_key = queue_opts[:routing_key] || queue_name
+        routing_keys = [routing_key, *queue_opts[:routing_keys]]
 
-      routing_keys.each do |key|
-        queue.bind(exchange, routing_key: key)
+        routing_keys.each do |key|
+          queue.bind(exchange, routing_key: key)
+        end
+        queue
+      rescue => e
+        Fluffy.logger.fatal e.message
+        raise SetupError.new e.message
       end
-      queue
     end
 
     def handler(handler_class, handler_opts)
@@ -68,7 +73,7 @@ module Fluffy
 
     def cleanup(force = false)
       if (@processor && force) || !@processor
-        @channel.close
+        @channel.close unless @channel.closed?
         @channel = nil
         @exchange = nil
         if @default_handler

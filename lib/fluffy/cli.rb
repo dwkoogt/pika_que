@@ -32,8 +32,8 @@ module Fluffy
         end
 
         exit 0
-      rescue Interrupt
-        Fluffy.logger.info 'Shutting down'
+      rescue Interrupt, SetupError => e
+        Fluffy.logger.info "Shutting down: #{e.class.name} received"
         runner.stop
         exit 1
       end

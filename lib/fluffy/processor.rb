@@ -15,17 +15,20 @@ module Fluffy
       @thread = nil
     end
 
+    def setup
+      @workers.each(&:prepare)
+    end
+
     def process
-      @workers.each do |worker|
-        worker.start
-      end
+      @workers.each(&:run)
     end
 
     def start
       @thread = Thread.new do
         Thread.current['label'] = 'processor'
+        setup
         process
-      end
+      end.abort_on_exception = true
     end
 
     def stop
