@@ -12,9 +12,9 @@ module Fluffy
         Fluffy.logger.info("COUNT: #{metric} #{COUNTERS[metric]}")
       end
 
-      def measure(metric)
+      def measure(metric, &block)
         start = Time.now
-        yield
+        block.call
         Fluffy.logger.info("TIME: #{metric} #{Time.now - start}")
       end
 
