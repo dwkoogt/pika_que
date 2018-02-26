@@ -62,7 +62,7 @@ module Fluffy
     end
 
     def channel
-      @channel ||= @opts[:channel] || init_channel
+      @channel ||= init_channel
     end
 
     def init_channel
