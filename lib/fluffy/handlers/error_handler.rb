@@ -10,41 +10,58 @@ module Fluffy
       }.freeze
      
       def initialize(opts = {})
-        opts = Fluffy.config.merge(DEFAULT_ERROR_OPTS).merge(opts)
-        @connection = opts[:connection] || Fluffy.connection
+        @opts = Fluffy.config.merge(DEFAULT_ERROR_OPTS).merge(opts)
+        @connection = @opts[:connection] || Fluffy.connection
         @channel = @connection.create_channel
-        @exchange = @channel.exchange(opts[:exchange], opts[:exchange_options])
-        @queue = @channel.queue(opts[:queue], opts[:queue_options])
-        @queue.bind(@exchange, routing_key: opts[:routing_key])
+        @exchange = @channel.exchange(@opts[:exchange], type: exchange_type, durable: exchange_durable?)
+        @queue = @channel.queue(@opts[:queue], durable: queue_durable?)
+        @queue.bind(@exchange, routing_key: @opts[:routing_key])
         @monitor = Monitor.new
+      end
+
+      def bind_queue(queue, retry_routing_key)
       end
 
       def handle(response_code, channel, delivery_info, metadata, msg, error = nil)
         case response_code
         when :ack
-          Fluffy.logger.debug "acknowledge <#{msg}>"
+          Fluffy.logger.debug "ErrorHandler acknowledge <#{msg}>"
           channel.acknowledge(delivery_info.delivery_tag, false)
         when :reject
-          Fluffy.logger.debug "reject <#{msg}>"
+          Fluffy.logger.debug "ErrorHandler reject <#{msg}>"
           channel.reject(delivery_info.delivery_tag, false)
         when :requeue
-          Fluffy.logger.debug "requeue <#{msg}>"
+          Fluffy.logger.debug "ErrorHandler requeue <#{msg}>"
           channel.reject(delivery_info.delivery_tag, true)
         else
-          Fluffy.logger.debug "publishing <#{msg}> to [#{@queue.name}]"
+          Fluffy.logger.debug "ErrorHandler publishing <#{msg}> to [#{@queue.name}]"
           publish(delivery_info, msg)
           channel.acknowledge(delivery_info.delivery_tag, false)
         end
+      end
+
+      def close
+        @channel.close unless @channel.closed?
+      end
+
+      private
+
+      def queue_durable?
+        @opts.fetch(:queue_options, {}).fetch(:durable, false)
+      end
+
+      def exchange_durable?
+        @opts.fetch(:exchange_options, {}).fetch(:durable, false)
+      end
+
+      def exchange_type
+        @opts.fetch(:exchange_options, {}).fetch(:type, :topic)
       end
 
       def publish(delivery_info, msg)
         @monitor.synchronize do
           @exchange.publish(msg, routing_key: delivery_info.routing_key)
         end
-      end
-
-      def close
-        @channel.close
       end
 
     end    

@@ -22,6 +22,8 @@ module Fluffy
 
     def setup_handler(handler_class, handler_opts)
       @handler = broker.handler(handler_class, handler_opts)
+      # TODO use routing keys?
+      @handler.bind_queue(@queue, @queue.name)
     end
 
     def subscribe(worker)
