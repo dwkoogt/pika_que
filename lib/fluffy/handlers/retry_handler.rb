@@ -136,7 +136,7 @@ module Fluffy
         num_attempts = failure_count(metadata[:headers]) + 1
         if num_attempts <= @max_retries
           # Publish message to the x-dead-letter-exchange (ie. retry exchange)
-          Fluffy.logger.info "RetryHandler msg=retrying, count=#{num_attempts}, headers=#{metadata[:headers]}"
+          Fluffy.logger.info "RetryHandler msg=retrying, count=#{num_attempts}, headers=#{metadata[:headers] || {}}"
           
           if @opts[:retry_mode] == :exp
             backoff_ttl = Expbackoff.next_ttl(num_attempts, @backoff_base)
