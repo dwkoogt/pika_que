@@ -133,10 +133,10 @@ module Fluffy
 
       def handle_retry(channel, delivery_info, metadata, msg, reason)
         # +1 for the current attempt
-        num_attempts = failure_count(props[:headers]) + 1
+        num_attempts = failure_count(metadata[:headers]) + 1
         if num_attempts <= @max_retries
           # Publish message to the x-dead-letter-exchange (ie. retry exchange)
-          Fluffy.logger.info "RetryHandler msg=retrying, count=#{num_attempts}, headers=#{props[:headers]}"
+          Fluffy.logger.info "RetryHandler msg=retrying, count=#{num_attempts}, headers=#{metadata[:headers]}"
           
           if @opts[:retry_mode] == :exp
             backoff_ttl = Expbackoff.next_ttl(num_attempts, @backoff_base)
@@ -144,10 +144,10 @@ module Fluffy
             backoff_ttl = @opts[:retry_const_backoff]
           end
 
-          publish_retry(msg, delivery_info, { backoff: backoff_ttl, count: num_attempts })
+          publish_retry(delivery_info, msg, { backoff: backoff_ttl, count: num_attempts })
           channel.acknowledge(delivery_info.delivery_tag, false)
         else
-          Fluffy.logger.info "RetryHandler msg=failing, retry_count=#{num_attempts}, headers=#{props[:headers]}, reason=#{reason}"
+          Fluffy.logger.info "RetryHandler msg=failing, retry_count=#{num_attempts}, headers=#{metadata[:headers]}, reason=#{reason}"
 
           publish_error(delivery_info, msg)
           channel.acknowledge(delivery_info.delivery_tag, false)
