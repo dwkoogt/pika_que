@@ -1,11 +1,11 @@
 # > bundle exec ruby examples/demo_delay.rb
-require 'fluffy'
-require 'fluffy/worker'
-require 'fluffy/runner'
+require 'pika_que'
+require 'pika_que/worker'
+require 'pika_que/runner'
 
 class DemoWorker
-  include Fluffy::Worker
-  from_queue "fluffy-demo"
+  include PikaQue::Worker
+  from_queue "pika-que-demo"
 
   def perform(msg)
     logger.info msg["msg"]
@@ -14,12 +14,12 @@ class DemoWorker
 
 end
 
-Fluffy.logger.level = ::Logger::DEBUG
+PikaQue.logger.level = ::Logger::DEBUG
 
-Fluffy.config.add_processor(Fluffy.config.delete(:delay_options))
-Fluffy.config.add_processor(workers: [DemoWorker])
+PikaQue.config.add_processor(PikaQue.config.delete(:delay_options))
+PikaQue.config.add_processor(workers: [DemoWorker])
 
-runner = Fluffy::Runner.new
+runner = PikaQue::Runner.new
 
 begin
   runner.run

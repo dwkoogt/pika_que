@@ -1,12 +1,12 @@
 # > bundle exec ruby examples/demo_retry.rb
-require 'fluffy'
-require 'fluffy/worker'
-require 'fluffy/handlers/retry_handler'
+require 'pika_que'
+require 'pika_que/worker'
+require 'pika_que/handlers/retry_handler'
 
 class DemoWorker
-  include Fluffy::Worker
-  from_queue "fluffy-demo"
-  handle_with Fluffy::Handlers::RetryHandler, retry_mode: :const, retry_max_times: 3
+  include PikaQue::Worker
+  from_queue "pika-que-demo"
+  handle_with PikaQue::Handlers::RetryHandler, retry_mode: :const, retry_max_times: 3
 
   def perform(msg)
     logger.info msg["msg"]
@@ -16,12 +16,12 @@ class DemoWorker
 
 end
 
-Fluffy.logger.level = ::Logger::DEBUG
+PikaQue.logger.level = ::Logger::DEBUG
 
 workers = [DemoWorker]
 
 begin
-  pro = Fluffy::Processor.new(workers: workers)
+  pro = PikaQue::Processor.new(workers: workers)
   pro.start
 rescue => e
   puts e

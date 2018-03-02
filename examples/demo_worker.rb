@@ -1,10 +1,10 @@
-require 'fluffy/worker'
-require 'fluffy/handlers/error_handler'
+require 'pika_que/worker'
+require 'pika_que/handlers/error_handler'
 
 class DemoWorker
-  include Fluffy::Worker
-  from_queue "fluffy-demo"
-  handle_with Fluffy::Handlers::ErrorHandler
+  include PikaQue::Worker
+  from_queue "pika-que-demo"
+  handle_with PikaQue::Handlers::ErrorHandler
 
   def perform(msg)
     logger.info msg["msg"]

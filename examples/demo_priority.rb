@@ -1,12 +1,12 @@
 # > bundle exec ruby examples/demo_priority.rb
-require 'fluffy'
-require 'fluffy/worker'
+require 'pika_que'
+require 'pika_que/worker'
 
-Fluffy.logger.level = ::Logger::DEBUG
+PikaQue.logger.level = ::Logger::DEBUG
 
 class HighPriorityWorker
-  include Fluffy::Worker
-  from_queue "fluffy-priority", :arguments => { :'x-max-priority' => 10 }, :priority => 10
+  include PikaQue::Worker
+  from_queue "pika-que-priority", :arguments => { :'x-max-priority' => 10 }, :priority => 10
 
   def perform(msg)
     logger.info msg["msg"]
@@ -16,8 +16,8 @@ class HighPriorityWorker
 end
 
 class LowPriorityWorker
-  include Fluffy::Worker
-  from_queue "fluffy-priority", :arguments => { :'x-max-priority' => 10 }, :priority => 1
+  include PikaQue::Worker
+  from_queue "pika-que-priority", :arguments => { :'x-max-priority' => 10 }, :priority => 1
 
   def perform(msg)
     logger.info msg["msg"]
@@ -29,7 +29,7 @@ end
 workers = [HighPriorityWorker,LowPriorityWorker]
 
 begin
-  pro = Fluffy::Processor.new(workers: workers, concurrency: 10)
+  pro = PikaQue::Processor.new(workers: workers, concurrency: 10)
   pro.start
 rescue => e
   puts e

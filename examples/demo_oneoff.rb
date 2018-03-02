@@ -1,10 +1,10 @@
 # > bundle exec ruby examples/demo_oneoff.rb
 $: << File.expand_path('../examples', File.dirname(__FILE__))
-require 'fluffy'
+require 'pika_que'
 
 require 'dev_worker'
 
-Fluffy.logger.level = ::Logger::DEBUG
+PikaQue.logger.level = ::Logger::DEBUG
 
 begin
   pro = DevWorker.new(concurrency: 2)

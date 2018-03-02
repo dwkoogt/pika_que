@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+
+require "pika_que"
+require "pika_que/cli"
+
+cli = PikaQue::CLI.new
+cli.parse
+cli.run
