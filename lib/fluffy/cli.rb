@@ -102,6 +102,12 @@ module Fluffy
         require(File.expand_path(config[:require])) || raise(ArgumentError, 'require returned false')
       end
 
+      if config[:delay]
+        config.add_processor(config.delete(:delay_options))
+      else
+        config.delete(:delay_options)
+      end
+
       if config[:workers]
         config.add_processor({ workers: config.delete(:workers) })
       end

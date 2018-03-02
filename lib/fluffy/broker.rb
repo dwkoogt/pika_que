@@ -23,7 +23,7 @@ module Fluffy
       @opts[:connection_options] || @processor.nil?
     end
 
-    def queue(queue_name, queue_opts)
+    def queue(queue_name, queue_opts = {})
       begin
         queue = channel.queue(queue_name, queue_opts)
         routing_key = queue_opts[:routing_key] || queue_name
@@ -39,7 +39,7 @@ module Fluffy
       end
     end
 
-    def handler(handler_class, handler_opts)
+    def handler(handler_class, handler_opts = {})
       if handler_class
         h_key = "#{handler_class}-#{handler_opts.hash}"
         _handler = @handlers[h_key]

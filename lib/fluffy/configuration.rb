@@ -6,6 +6,9 @@ require 'fluffy/codecs/noop'
 require 'fluffy/processor'
 require 'fluffy/handlers/default_handler'
 
+require 'fluffy/delay_worker'
+require 'fluffy/handlers/delay_handler'
+
 module Fluffy
   class Configuration
     extend Forwardable
@@ -30,6 +33,12 @@ module Fluffy
       :consumer_pool_size => 1,
       :prefetch           => 10
     }.freeze
+
+    DELAY_PROCESSOR_DEFAULTS = {
+      :workers            => [Fluffy::DelayWorker],
+      :handler_class      => Fluffy::Handlers::DelayHandler,
+      :concurrency        => 1
+    }.freeze
   
     DEFAULT_CONFIG = {
       :exchange           => 'fluffy',
@@ -45,9 +54,11 @@ module Fluffy
       :processors         => [],
       :reporters          => [],
       :metrics            => nil,
+      :delay              => true,
+      :delay_options      => DELAY_PROCESSOR_DEFAULTS,
       :pidfile            => nil,
       :require            => '.'
-    }
+    }.freeze
 
     # processor example
     # @processor            Processor class
