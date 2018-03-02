@@ -6,7 +6,7 @@ module Fluffy
         # nothing to do here
       end
 
-      def bind_queue(queue, retry_routing_key)
+      def bind_queue(queue, routing_key)
       end
 
       def handle(response_code, channel, delivery_info, metadata, msg, error = nil)

@@ -36,16 +36,16 @@ module Fluffy
         @backoff_multiplier = @opts[:retry_backoff_multiplier] # This is for example/dev/test
 
         @retry_name = "#{@opts[:retry_prefix]}-retry"
-        @error_name = "#{@opts[:retry_prefix]}-error"
         @requeue_name = "#{@opts[:retry_prefix]}-retry-requeue"
+        @error_name = "#{@opts[:retry_prefix]}-error"
 
         setup_exchanges
         setup_queues
       end
 
-      def bind_queue(queue, retry_routing_key)
+      def bind_queue(queue, routing_key)
         # bind the worker queue to requeue exchange
-        queue.bind(@requeue_exchange, :routing_key => retry_routing_key)
+        queue.bind(@requeue_exchange, :routing_key => routing_key)
       end
 
       def handle(response_code, channel, delivery_info, metadata, msg, error = nil)
@@ -88,7 +88,7 @@ module Fluffy
         Fluffy.logger.debug "RetryHandler creating exchange=#{@retry_name}"
         @retry_exchange = @channel.exchange(@retry_name, :type => 'headers', :durable => exchange_durable?)
         @error_exchange, @requeue_exchange = [@error_name, @requeue_name].map do |name|
-          Fluffy.logger.debug { "RetryHandler creating exchange=#{name}" }
+          Fluffy.logger.debug "RetryHandler creating exchange=#{name}"
           @channel.exchange(name, :type => 'topic', :durable => exchange_durable?)
         end
       end
