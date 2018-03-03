@@ -28,6 +28,8 @@ class PokeWorker
 
   def perform(msg)
     # do something with msg["greeting"]
+    # or below for active job
+    ActiveJob::Base.execute msg
     ack!
   end
 end
