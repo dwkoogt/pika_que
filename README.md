@@ -1,8 +1,9 @@
 # PikaQue
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pika_que`. To experiment with that code, run `bin/console` for an interactive prompt.
+A RabbitMQ background processing framework for Ruby with built-in support for Rails integration.
 
-TODO: Delete this and the text above, and describe your gem
+PikaQue is inspired by Sneakers, Hutch, and Sidekiq. It is intended to implement more support for Rails a la Sidekiq.
+It supports retry (both constant and exponential backoffs) and delayed/scheduled execution.
 
 ## Installation
 
@@ -12,17 +13,67 @@ Add this line to your application's Gemfile:
 gem 'pika_que'
 ```
 
-And then execute:
-
-    $ bundle
-
 Or install it yourself as:
 
     $ gem install pika_que
 
 ## Usage
 
-TODO: Write usage instructions here
+To create a worker:
+
+```ruby
+class PokeWorker
+  include PikaQue::Worker
+  from_queue "rocket"
+
+  def perform(msg)
+    # do something with msg["greeting"]
+    ack!
+  end
+end
+```
+
+To enqueue a job:
+
+```ruby
+PokeWorker.enqueue({ greeting: "I Challenge You!" })
+```
+
+To run server:
+
+    $ bundle exec pika_que
+    
+### Rails and ActiveJob
+
+Create workers in:
+
+    app/workers
+    
+Create a initializer file `pika_que.rb` in:
+
+    config/initializers
+    
+```ruby
+# pika_que.rb
+
+require 'active_job/queue_adapters/pika_que_adapter'
+
+# override default queue_name for ActiveJob::Base and ActionMailer::DeliveryJob here if necessary
+
+# setup workers here or with config/pika_que.yml
+PikaQue.config.add_processor(workers: [PokeWorker])
+PikaQue.config[:codec] = PikaQue::Codecs::RAILS
+```
+
+Set the backend for active job in `config/application.rb`:
+
+    config.active_job.queue_adapter = :pika_que
+
+Then run the server.
+
+## Specs
+
+Coming soon. See examples for reference.
 
 ## Development
 
@@ -32,7 +83,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pika_que. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/dwkoogt/pika_que. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
