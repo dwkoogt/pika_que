@@ -105,7 +105,7 @@ module PikaQue
                                         })
           backoff_queue.bind(@retry_exchange, :arguments => { :backoff => bo })
         else
-          backoffs = Expbackoff.backoff_periods(@max_retries, @backoff_base)
+          backoffs = RetryHandler.backoff_periods(@max_retries, @backoff_base)
           backoffs.each do |bo|
             PikaQue.logger.debug "RetryHandler creating queue=#{@retry_name}-#{bo} x-dead-letter-exchange=#{@requeue_name}"
             backoff_queue = @channel.queue("#{@retry_name}-#{bo}",
@@ -139,7 +139,7 @@ module PikaQue
           PikaQue.logger.info "RetryHandler msg=retrying, count=#{num_attempts}, headers=#{metadata[:headers] || {}}"
           
           if @opts[:retry_mode] == :exp
-            backoff_ttl = Expbackoff.next_ttl(num_attempts, @backoff_base)
+            backoff_ttl = RetryHandler.next_ttl(num_attempts, @backoff_base)
           else
             backoff_ttl = @opts[:retry_const_backoff]
           end
