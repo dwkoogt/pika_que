@@ -39,7 +39,7 @@ module PikaQue
         workers = []
         processor['workers'].each do |worker|
           queue = worker['queue']
-          worker_name = worker['worker'] || "#{queue.classify}Worker"
+          worker_name = worker['worker'] || "#{queue.underscore.classify}Worker"
           Object.const_set(worker_name, Class.new do
               include PikaQue::Worker
               from_queue queue
@@ -50,7 +50,7 @@ module PikaQue
                 ack!
               end
             end
-          ) unless worker_files.detect{ |w| w =~ /#{worker_name.snakecase}/ }
+          ) unless worker_files.detect{ |w| w =~ /#{worker_name.underscore}/ }
           workers << worker_name
         end
         proc_args = { workers: workers }
