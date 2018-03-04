@@ -7,6 +7,7 @@ class DemoWorker
   include PikaQue::Worker
   from_queue "pika-que-demo"
   handle_with PikaQue::Handlers::RetryHandler, retry_mode: :const, retry_max_times: 3
+  # handle_with PikaQue::Handlers::RetryHandler, retry_mode: :exp, retry_max_times: 2
 
   def perform(msg)
     logger.info msg["msg"]
