@@ -18,7 +18,7 @@ module PikaQue
     end
 
     config.after_initialize do
-      config_file = Rails.root.join('config').join('pika_que.yml')
+      config_file = ::Rails.root.join('config').join('pika_que.yml')
       if File.exist? config_file
         PIKA_QUE_CONFIG = YAML.load_file(config_file)
       else
@@ -26,7 +26,7 @@ module PikaQue
         PIKA_QUE_CONFIG = { "processors" => [{ "workers" => [{ "queue" => ActiveJob::Base.queue_name }, { "queue" => mailer_queue.to_s }] }] }
       end
 
-      workers_dir = Rails.root.join('app').join('workers')
+      workers_dir = ::Rails.root.join('app').join('workers')
       if Dir.exist? workers_dir
         worker_files = Dir.glob(workers_dir.join('*.rb'))
       else
