@@ -58,13 +58,8 @@ Create a initializer file `pika_que.rb` in:
 ```ruby
 # pika_que.rb
 
-require 'active_job/queue_adapters/pika_que_adapter'
-
-# override default queue_name for ActiveJob::Base and ActionMailer::DeliveryJob here if necessary
-
-# setup workers here or with config/pika_que.yml
+# setup workers here. see source for available options
 PikaQue.config.add_processor(workers: [PokeWorker])
-PikaQue.config[:codec] = PikaQue::Codecs::RAILS
 ```
 
 Set the backend for active job in `config/application.rb`:
