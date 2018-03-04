@@ -22,7 +22,8 @@ module PikaQue
       if File.exist? config_file
         PIKA_QUE_CONFIG = YAML.load_file(config_file)
       else
-        PIKA_QUE_CONFIG = { "processors" => [{ "workers" => [{ "queue" => ActiveJob::Base.queue_name }, { "queue" => ActionMailer::DeliveryJob.queue_name}] }] }
+        mailer_queue = (::Rails::VERSION::MAJOR < 5) ? ActionMailer::DeliveryJob.queue_name : ActionMailer::Base.deliver_later_queue_name
+        PIKA_QUE_CONFIG = { "processors" => [{ "workers" => [{ "queue" => ActiveJob::Base.queue_name }, { "queue" => mailer_queue.to_s }] }] }
       end
 
       workers_dir = Rails.root.join('app').join('workers')

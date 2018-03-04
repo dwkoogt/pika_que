@@ -14,7 +14,7 @@ module ActiveJob
     #
     #   Rails.application.config.active_job.queue_adapter = :pika_que
     #
-    class PikaQueAdapter
+    class PikaQueRails4
       @monitor = Monitor.new
 
       class << self
@@ -37,6 +37,30 @@ module ActiveJob
       end
     end
 
-    autoload :PikaQueAdapter
+    class PikaQueRails5
+      def initialize
+        @monitor = Monitor.new
+      end
+
+      def enqueue(job) #:nodoc:
+        @monitor.synchronize do
+          JobWrapper.enqueue job.serialize, to_queue: job.queue_name
+        end
+      end
+
+      def enqueue_at(job, timestamp) #:nodoc:
+        @monitor.synchronize do
+          JobWrapper.enqueue_at job.serialize, timestamp, routing_key: job.queue_name
+        end
+      end
+
+      class JobWrapper #:nodoc:
+        extend PikaQue::Worker::ClassMethods
+        config codec: PikaQue::Codecs::RAILS
+      end
+    end
+
+    PikaQueAdapter = (::Rails::VERSION::MAJOR < 5) ? PikaQueRails4 : PikaQueRails5
+
   end
 end
