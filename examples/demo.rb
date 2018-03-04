@@ -30,7 +30,7 @@ pub = PikaQue::Publisher.new()
 300.times do |i|
   pub.publish({ msg: "hello world #{i}" }, routing_key: 'pika-que-dev')
   pub.publish({ msg: "hola mundo #{i}" }, routing_key: 'pika-que-demo')
-  # ph.publish({ msg: "hello world #{i} wait" }, routing_key: 'pika_que-dev', expiration: 10000)
+  # ph.publish({ msg: "hello world #{i} wait" }, routing_key: 'pika-que-dev', expiration: 10000)
 end
 
 sleep 3
