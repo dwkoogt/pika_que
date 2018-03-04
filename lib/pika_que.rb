@@ -42,3 +42,5 @@ module PikaQue
   end
 
 end
+
+require 'pika_que/rails' if defined?(::Rails::Engine)
