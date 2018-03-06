@@ -145,12 +145,12 @@ module PikaQue
           end
 
           publish_retry(delivery_info, msg, { backoff: backoff_ttl, count: num_attempts })
-          channel.acknowledge(delivery_info.delivery_tag, false)
+          channel.reject(delivery_info.delivery_tag, false)
         else
           PikaQue.logger.info "RetryHandler msg=failing, retry_count=#{num_attempts}, headers=#{metadata[:headers]}, reason=#{reason}"
 
           publish_error(delivery_info, msg)
-          channel.acknowledge(delivery_info.delivery_tag, false)
+          channel.reject(delivery_info.delivery_tag, false)
         end
       end
 
