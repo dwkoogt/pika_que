@@ -18,6 +18,10 @@ module PikaQue
     @config ||= Configuration.new
   end
 
+  def self.configure(opts = {})
+    config.merge!(opts)
+  end
+
   def self.logger
     PikaQue::Logging.logger
   end
