@@ -77,6 +77,8 @@ module PikaQue
 
     def initialize
       @config = DEFAULT_CONFIG.dup
+      @config[:amqp]  = ENV.fetch('RABBITMQ_URL', 'amqp://guest:guest@localhost:5672')
+      @config[:vhost] = AMQ::Settings.parse_amqp_url(@config[:amqp]).fetch(:vhost, '/')
     end
 
     def merge!(other = {})

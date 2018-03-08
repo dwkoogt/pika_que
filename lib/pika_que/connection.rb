@@ -10,8 +10,6 @@ module PikaQue
 
     def initialize(opts = {})
       @opts = PikaQue.config.merge(opts)
-      @opts[:amqp]  = ENV.fetch('RABBITMQ_URL', 'amqp://guest:guest@localhost:5672')
-      @opts[:vhost] = AMQ::Settings.parse_amqp_url(@opts[:amqp]).fetch(:vhost, '/')
     end
 
     def self.create(opts = {})
