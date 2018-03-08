@@ -16,6 +16,7 @@ module PikaQue
     end
 
     def setup
+      logger.info "setting up processor with workers: #{@workers.map(&:class)}"
       @workers.each(&:prepare)
     end
 
