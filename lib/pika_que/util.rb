@@ -3,7 +3,7 @@ module PikaQue
     extend self
     
     def constantize(str)
-      return str if str.is_a? Class
+      return str if (str.is_a?(Class) || str.is_a?(Module))
 
       names = str.split('::')
       names.shift if names.empty? || names.first.empty?

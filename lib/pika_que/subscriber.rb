@@ -1,5 +1,6 @@
 require 'pika_que/reporters'
 require 'pika_que/metrics'
+require 'pika_que/util'
 
 module PikaQue
   class Subscriber
@@ -11,7 +12,7 @@ module PikaQue
 
     def initialize(opts = {})
       @opts = PikaQue.config.merge(opts)
-      @codec = @opts[:codec]
+      @codec = PikaQue::Util.constantize(@opts[:codec])
       @broker = @opts[:broker] || PikaQue::Broker.new(nil, @opts).tap{ |b| b.start }
       @pool = @opts[:worker_pool] || Concurrent::FixedThreadPool.new(@opts[:concurrency] || 1)
     end
