@@ -10,6 +10,7 @@ require 'pika_que/connection'
 require 'pika_que/publisher'
 require 'pika_que/reporters/log_reporter'
 require 'pika_que/middleware/chain'
+require 'pika_que/handlers'
 require 'pika_que/worker'
 
 module PikaQue

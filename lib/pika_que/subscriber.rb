@@ -21,8 +21,9 @@ module PikaQue
     end
 
     def setup_handler(handler_class, handler_opts)
-      @handler = broker.handler(handler_class, handler_opts)
+      @handler = broker.handler(handler_class, @opts[:handler_options].merge(handler_opts || {}))
       # TODO use routing keys?
+      logger.info "binding queue #{@queue.name} to handler #{@handler.class}"
       @handler.bind_queue(@queue, @queue.name)
     end
 

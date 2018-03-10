@@ -71,7 +71,7 @@ module PikaQue
     #   :concurrency        => 1,
     #   :ack                => true,
     #   :handler_class      => nil,
-    #   :handler_options    => nil,
+    #   :handler_options    => {},
     #   :codec              => PikaQue::Codecs::JSON
     # }
 
