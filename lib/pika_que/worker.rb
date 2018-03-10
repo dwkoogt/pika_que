@@ -57,12 +57,12 @@ module PikaQue
       def from_queue(q, opts={})
         @queue_name = q.to_s
         @priority = opts.delete(:priority)
-        @queue_opts = PikaQue.config[:queue_options].merge(opts)
+        @queue_opts = opts
       end
 
       def handle_with(handler, opts={})
         @handler_class = handler
-        @handler_opts = PikaQue.config[:handler_options].merge(opts)
+        @handler_opts = opts
       end
 
       def enqueue(msg, opts={})
