@@ -33,8 +33,6 @@ module PikaQue
         worker_files = []
       end
 
-      # TODO options, etc
-
       PIKA_QUE_CONFIG['processors'].each do |processor|
         workers = []
         processor['workers'].each do |worker|
@@ -53,8 +51,9 @@ module PikaQue
           ) unless worker_files.detect{ |w| w =~ /#{worker_name.underscore}/ }
           workers << worker_name
         end
-        proc_args = { workers: workers }
-        proc_args[:processor] = processor['processor'] if processor['processor']
+        proc_args = processor.symbolize_keys
+        proc_args[:workers] = workers
+        PikaQue.logger.info "Adding rails processor: #{proc_args}"
         PikaQue.config.add_processor(proc_args)
       end
     end
