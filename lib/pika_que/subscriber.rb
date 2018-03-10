@@ -35,8 +35,8 @@ module PikaQue
           error = nil
           begin
             decoded_msg = @codec.decode(msg)
-            metrics.measure("work.#{self.class.name}.time") do
-              PikaQue.middleware.invoke(self, delivery_info, metadata, decoded_msg) do
+            metrics.measure("work.#{worker.class.name}.time") do
+              PikaQue.middleware.invoke(worker, delivery_info, metadata, decoded_msg) do
                 res = worker.work(delivery_info, metadata, decoded_msg)
               end
             end
@@ -50,15 +50,15 @@ module PikaQue
           if @opts[:ack]
             begin
               handler.handle(res, broker.channel, delivery_info, metadata, msg, error)
-              metrics.increment("work.#{self.class.name}.handled.#{res}") 
+              metrics.increment("work.#{worker.class.name}.handled.#{res}") 
             rescue => handler_err
               notify_reporters(handler_err, handler.class, msg)
-              metrics.increment("work.#{self.class.name}.handler.error") 
+              metrics.increment("work.#{worker.class.name}.handler.error") 
             end
           else
-            metrics.increment("work.#{self.class.name}.handled.noop") 
+            metrics.increment("work.#{worker.class.name}.handled.noop") 
           end
-          metrics.increment("work.#{self.class.name}.processed")
+          metrics.increment("work.#{worker.class.name}.processed")
         end
       end
     end
