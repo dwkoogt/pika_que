@@ -1,4 +1,11 @@
 processors:
   - workers:
-    - queue: default
     - queue: mailers
+    handler_class: PikaQue::Handlers::RetryHandler
+    handler_options:
+      retry_mode: :const
+  - workers:
+    - queue: default
+    handler_class: PikaQue::Handlers::RetryHandler
+    handler_options:
+      retry_mode: :exp
