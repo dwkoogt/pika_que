@@ -4,7 +4,7 @@ module PikaQue
   module Worker
 
     def initialize(opts = {})
-      @subscriber = PikaQue::Subscriber.new(opts)
+      @subscriber = PikaQue::Subscriber.new(opts.merge(self.class.local_config || {}))
     end
 
     def prepare
@@ -52,7 +52,7 @@ module PikaQue
       attr_reader :handler_class
       attr_reader :handler_opts
       attr_reader :priority
-      attr_reader :config
+      attr_reader :local_config
 
       def from_queue(q, opts={})
         @queue_name = q.to_s
@@ -83,14 +83,14 @@ module PikaQue
       end
       alias_method :perform_at, :enqueue
 
-      def config(opts={})
-        @config = opts
+      def config(opts)
+        @local_config = opts
       end
 
       private
 
       def publisher
-        @publisher ||= PikaQue::Publisher.new(config || {})
+        @publisher ||= PikaQue::Publisher.new(local_config || {})
       end
 
     end
