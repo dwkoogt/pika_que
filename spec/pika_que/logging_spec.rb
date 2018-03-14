@@ -16,6 +16,7 @@ describe PikaQue::Logging do
 
     context 'with a custom logger' do
       let(:dummy_logger) { double("Dummy logger") }
+      after { described_class.logger = nil }
 
       it "users the custom logger" do
         described_class.logger = dummy_logger
