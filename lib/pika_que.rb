@@ -46,6 +46,12 @@ module PikaQue
     config[:reporters]
   end
 
+  def self.reset!
+    @config = nil
+    @connection = nil
+    @chain = nil
+  end
+
 end
 
 require 'pika_que/rails' if defined?(::Rails::Engine)
