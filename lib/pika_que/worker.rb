@@ -75,7 +75,7 @@ module PikaQue
       alias_method :perform_async, :enqueue
 
       def enqueue_at(msg, timestamp, opts={})
-        opts[:to_queue] ||= "#{PikaQue.config[:exchange]}-delay"
+        opts[:to_queue] ||= "#{publisher.exchange_name}-delay"
         work_queue = opts.delete(:routing_key) || (queue_opts[:routing_key] if queue_opts) || queue_name
         opts[:headers] = { work_at: timestamp, work_queue: work_queue }
 

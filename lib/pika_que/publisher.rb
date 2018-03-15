@@ -21,5 +21,9 @@ module PikaQue
       @exchange.publish(msg, options)
     end
 
+    def exchange_name
+      @opts[:exchange]
+    end
+
   end
 end
