@@ -7,3 +7,6 @@ SimpleCov.start do
 end
 
 require 'pika_que'
+
+# autoload
+PikaQue::Handlers::RetryHandler

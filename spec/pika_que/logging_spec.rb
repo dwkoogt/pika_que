@@ -16,7 +16,7 @@ describe PikaQue::Logging do
       let(:dummy_logger) { double("Dummy logger") }
       after { described_class.logger = nil }
 
-      it "users the custom logger" do
+      it "uses the custom logger" do
         described_class.logger = dummy_logger
         expect(described_class.logger).to eq(dummy_logger)
       end
