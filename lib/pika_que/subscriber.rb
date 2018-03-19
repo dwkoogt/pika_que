@@ -32,36 +32,40 @@ module PikaQue
       @consumer = queue.subscribe(:block => false, :manual_ack => @opts[:ack], :arguments => worker.consumer_arguments) do | delivery_info, metadata, msg |
         # TODO make idletime configurable on thread pool? default is 60.
         pool.post do
-          res = nil
-          error = nil
-          begin
-            decoded_msg = @codec.decode(msg)
-            metrics.measure("work.#{worker.class.name}.time") do
-              PikaQue.middleware.invoke(worker, delivery_info, metadata, decoded_msg) do
-                res = worker.work(delivery_info, metadata, decoded_msg)
-              end
-            end
-            logger.debug "done processing #{res} <#{msg}>"
-          rescue => worker_err
-            res = :error
-            error = worker_err
-            notify_reporters(worker_err, worker.class, msg)
-          end
-
-          if @opts[:ack]
-            begin
-              handler.handle(res, broker.channel, delivery_info, metadata, msg, error)
-              metrics.increment("work.#{worker.class.name}.handled.#{res}") 
-            rescue => handler_err
-              notify_reporters(handler_err, handler.class, msg)
-              metrics.increment("work.#{worker.class.name}.handler.error") 
-            end
-          else
-            metrics.increment("work.#{worker.class.name}.handled.noop") 
-          end
-          metrics.increment("work.#{worker.class.name}.processed")
+          handle_message(worker, delivery_info, metadata, msg)
         end
       end
+    end
+
+    def handle_message(worker, delivery_info, metadata, msg)
+      res = nil
+      error = nil
+      begin
+        decoded_msg = @codec.decode(msg)
+        metrics.measure("work.#{worker.class.name}.time") do
+          PikaQue.middleware.invoke(worker, delivery_info, metadata, decoded_msg) do
+            res = worker.work(delivery_info, metadata, decoded_msg)
+          end
+        end
+        logger.debug "done processing #{res} <#{msg}>"
+      rescue => worker_err
+        res = :error
+        error = worker_err
+        notify_reporters(worker_err, worker.class, msg)
+      end
+
+      if @opts[:ack]
+        begin
+          handler.handle(res, broker.channel, delivery_info, metadata, msg, error)
+          metrics.increment("work.#{worker.class.name}.handled.#{res}") 
+        rescue => handler_err
+          notify_reporters(handler_err, handler.class, msg)
+          metrics.increment("work.#{worker.class.name}.handler.error") 
+        end
+      else
+        metrics.increment("work.#{worker.class.name}.handled.noop") 
+      end
+      metrics.increment("work.#{worker.class.name}.processed")
     end
 
     def unsubscribe
