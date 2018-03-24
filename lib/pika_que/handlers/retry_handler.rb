@@ -72,7 +72,7 @@ module PikaQue
 
       #####################################################
       # formula
-      # base X = 0, 30, 60, 120, 180, etc defaults to 0
+      # base X = 0, 15(2x), 30(3x), 45(4x), 60(5x), 120, 180, etc defaults to 0
       # (X + 15) * 2 ** (count + 1)
       def self.backoff_periods(max_retries, backoff_base)
         (1..max_retries).map{ |c| next_ttl(c, backoff_base) }
@@ -95,7 +95,12 @@ module PikaQue
 
       def setup_queues
         if @opts[:retry_mode] == :const
-          bo = @opts[:retry_const_backoff]
+          backoffs = [@opts[:retry_const_backoff]]
+        else
+          backoffs = RetryHandler.backoff_periods(@max_retries, @backoff_base)
+        end
+
+        backoffs.each do |bo|
           PikaQue.logger.debug "RetryHandler creating queue=#{@retry_name}-#{bo} x-dead-letter-exchange=#{@requeue_name}"
           backoff_queue = @channel.queue("#{@retry_name}-#{bo}",
                                         :durable => queue_durable?,
@@ -104,18 +109,6 @@ module PikaQue
                                           :'x-message-ttl' => bo * @backoff_multiplier
                                         })
           backoff_queue.bind(@retry_exchange, :arguments => { :backoff => bo })
-        else
-          backoffs = RetryHandler.backoff_periods(@max_retries, @backoff_base)
-          backoffs.each do |bo|
-            PikaQue.logger.debug "RetryHandler creating queue=#{@retry_name}-#{bo} x-dead-letter-exchange=#{@requeue_name}"
-            backoff_queue = @channel.queue("#{@retry_name}-#{bo}",
-                                          :durable => queue_durable?,
-                                          :arguments => {
-                                            :'x-dead-letter-exchange' => @requeue_name,
-                                            :'x-message-ttl' => bo * @backoff_multiplier
-                                          })
-            backoff_queue.bind(@retry_exchange, :arguments => { :backoff => bo })
-          end
         end
 
         PikaQue.logger.debug "RetryHandler creating queue=#{@error_name}"
@@ -147,7 +140,7 @@ module PikaQue
           publish_retry(delivery_info, msg, { backoff: backoff_ttl, count: num_attempts })
           channel.reject(delivery_info.delivery_tag, false)
         else
-          PikaQue.logger.info "RetryHandler msg=failing, retry_count=#{num_attempts}, headers=#{metadata[:headers]}, reason=#{reason}"
+          PikaQue.logger.info "RetryHandler msg=failing, retried_count=#{num_attempts - 1}, headers=#{metadata[:headers]}, reason=#{reason}"
 
           publish_error(delivery_info, msg)
           channel.reject(delivery_info.delivery_tag, false)
