@@ -45,7 +45,7 @@ module PikaQue
 
     def init_logger
       PikaQue::Logging.init_logger(config[:logfile]) if config[:logfile]
-      PikaQue.logger.level = ::Logger::WARN if config[:quite]
+      PikaQue.logger.level = ::Logger::WARN if config[:quiet]
       PikaQue.logger.level = ::Logger::DEBUG if config[:verbose]
     end
 
@@ -132,8 +132,8 @@ module PikaQue
           opts[:environment] = arg
         end
 
-        o.on '-q', '--quite', "Print quite output" do |arg|
-          opts[:quite] = arg
+        o.on '-q', '--quiet', "Print quiet output" do |arg|
+          opts[:quiet] = arg
         end
 
         o.on '-v', '--verbose', "Print verbose output" do |arg|

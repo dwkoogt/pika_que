@@ -11,7 +11,7 @@ module PikaQue
     def self.init_metrics
       if PikaQue.config[:metrics]
         @metrics = PikaQue.config[:metrics].new
-      elsif PikaQue.config[:quite]
+      elsif PikaQue.config[:quiet]
         @metrics = PikaQue::Metrics::NullMetric.new
       else
         @metrics = PikaQue::Metrics::LogMetric.new
