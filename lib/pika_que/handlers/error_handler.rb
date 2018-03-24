@@ -36,7 +36,7 @@ module PikaQue
         else
           PikaQue.logger.debug "ErrorHandler publishing <#{msg}> to [#{@queue.name}]"
           publish(delivery_info, msg)
-          channel.acknowledge(delivery_info.delivery_tag, false)
+          channel.reject(delivery_info.delivery_tag, false)
         end
       end
 
