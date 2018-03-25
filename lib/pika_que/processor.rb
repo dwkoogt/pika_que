@@ -29,7 +29,7 @@ module PikaQue
         Thread.current['label'] = 'processor'
         setup
         process
-      end.abort_on_exception = true
+      end.tap{ |t| t.abort_on_exception = true }
     end
 
     def stop
