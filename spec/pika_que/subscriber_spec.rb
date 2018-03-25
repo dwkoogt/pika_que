@@ -164,7 +164,7 @@ describe PikaQue::Subscriber do
       allow(queue).to receive(:subscribe).with(block: false, manual_ack: true, arguments: {}).and_return(consumer)
     end
 
-    it 'should create a consumer' do
+    it 'should cancel consumer' do
       subscriber.setup_queue('dummy', {})
       subscriber.setup_handler(PikaQue::Handlers::DefaultHandler, {})
       subscriber.subscribe(worker)
