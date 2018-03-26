@@ -55,7 +55,7 @@ Create a config file `pika_que.yml` in config:
     config/pika_que.yml
     
 ```yml
-# pika_que.rb
+# pika_que.yml
 processors:
   - workers:
     - queue: default
