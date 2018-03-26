@@ -24,12 +24,10 @@ To create a worker:
 ```ruby
 class PokeWorker
   include PikaQue::Worker
-  from_queue "rocket"
+  from_queue "poke"
 
   def perform(msg)
     # do something with msg["greeting"]
-    # or below for active job
-    ActiveJob::Base.execute msg
     ack!
   end
 end
@@ -45,21 +43,27 @@ To run server:
 
     $ bundle exec pika_que
     
-### Rails and ActiveJob
 
-Create workers in:
+### Rails and ActiveJob Quickstart
+
+Create workers(not required for ActiveJob) in:
 
     app/workers
     
-Create a initializer file `pika_que.rb` in:
+Create a config file `pika_que.yml` in config:
 
-    config/initializers
+    config/pika_que.yml
     
-```ruby
+```yml
 # pika_que.rb
+processors:
+  - workers:
+    - queue: default
+    - queue: mailers
+    - queue: your-active-job-queue-name
+  - workers:
+    - worker: PokeWorker
 
-# setup workers here. see source for available options
-PikaQue.config.add_processor(workers: [PokeWorker])
 ```
 
 Set the backend for active job in `config/application.rb`:
@@ -68,9 +72,11 @@ Set the backend for active job in `config/application.rb`:
 
 Then run the server.
 
-## Specs
+For more details, see https://github.com/dwkoogt/pika_que/wiki/Rails-Setup.
 
-Coming soon. See examples for reference.
+### Examples
+
+See examples for more usage reference.
 
 ## Development
 
