@@ -72,7 +72,7 @@ Set the backend for active job in `config/application.rb`:
 
 Then run the server.
 
-For more details, see https://github.com/dwkoogt/pika_que/wiki/Rails-Setup.
+For more details, see [wiki](https://github.com/dwkoogt/pika_que/wiki/Rails-Setup).
 
 ### Examples
 
