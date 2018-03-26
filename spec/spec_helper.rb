@@ -7,3 +7,6 @@ SimpleCov.start do
 end
 
 require 'pika_que'
+require 'pika_que/runner'
+require 'pika_que/launcher'
+require 'pika_que/cli'

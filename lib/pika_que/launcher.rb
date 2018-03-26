@@ -80,10 +80,10 @@ module PikaQue
       Thread.list.each do |thread|
         logger.warn "Thread TID-#{thread.object_id.to_s(36)} #{thread['label']}"
         if thread.backtrace
-            logger.warn thread.backtrace.join("\n")
-          else
-            logger.warn "<no backtrace available>"
-          end
+          logger.warn thread.backtrace.join("\n")
+        else
+          logger.warn "<no backtrace available>"
+        end
       end
     end
 
