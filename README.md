@@ -1,5 +1,7 @@
 # PikaQue
 
+![Build Status](https://travis-ci.org/dwkoogt/pika_que.svg?branch=master)
+
 A RabbitMQ background processing framework for Ruby with built-in support for Rails integration.
 
 PikaQue is inspired by Sneakers, Hutch, and Sidekiq. It is intended to implement more support for Rails a la Sidekiq.
