@@ -8,6 +8,7 @@ describe PikaQue::CLI do
   end
 
   describe '#parse' do
+    before { stub_const('ARGV', []) }
     it 'should parse' do
       expect(cli).to receive(:init_logger)
       expect(cli).to receive(:daemonize)
