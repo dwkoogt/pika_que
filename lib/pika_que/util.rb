@@ -13,5 +13,14 @@ module PikaQue
       end
     end
 
+    def register_worker_class(worker_name, base_class, queue_name, queue_opts = {}, handler_class = nil, handler_opts = {}, local_config = {})
+      Object.const_set(worker_name, Class.new(base_class) do
+          from_queue queue_name, queue_opts         
+          handle_with handler_class, handler_opts if handler_class
+          config local_config if local_config.any?
+        end
+      )
+    end
+
   end
 end
