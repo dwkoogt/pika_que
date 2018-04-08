@@ -1,5 +1,4 @@
-require 'pika_que'
-require 'pika_que/codecs/rails'
+require 'pika_que/rails_worker'
 require 'thread'
 
 module ActiveJob
@@ -20,20 +19,15 @@ module ActiveJob
       class << self
         def enqueue(job) #:nodoc:
           @monitor.synchronize do
-            JobWrapper.enqueue job.serialize, to_queue: job.queue_name
+            PikaQue::RailsWorker.enqueue job.serialize, to_queue: job.queue_name
           end
         end
 
         def enqueue_at(job, timestamp) #:nodoc:
           @monitor.synchronize do
-            JobWrapper.enqueue_at job.serialize, timestamp, routing_key: job.queue_name
+            PikaQue::RailsWorker.enqueue_at job.serialize, timestamp, routing_key: job.queue_name
           end
         end
-      end
-
-      class JobWrapper #:nodoc:
-        extend PikaQue::Worker::ClassMethods
-        config codec: PikaQue::Codecs::RAILS
       end
     end
 
@@ -44,19 +38,14 @@ module ActiveJob
 
       def enqueue(job) #:nodoc:
         @monitor.synchronize do
-          JobWrapper.enqueue job.serialize, to_queue: job.queue_name
+          PikaQue::RailsWorker.enqueue job.serialize, to_queue: job.queue_name, priority: job.priority
         end
       end
 
       def enqueue_at(job, timestamp) #:nodoc:
         @monitor.synchronize do
-          JobWrapper.enqueue_at job.serialize, timestamp, routing_key: job.queue_name
+          PikaQue::RailsWorker.enqueue_at job.serialize, timestamp, routing_key: job.queue_name
         end
-      end
-
-      class JobWrapper #:nodoc:
-        extend PikaQue::Worker::ClassMethods
-        config codec: PikaQue::Codecs::RAILS
       end
     end
 
