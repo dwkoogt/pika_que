@@ -148,6 +148,10 @@ module PikaQue
           opts[:workers] = arg.split(",")
         end
 
+        o.on '--no-delay', "turn off delay processor" do |arg|
+          opts[:delay] = arg
+        end
+
         o.on '-L', '--logfile PATH', "path to writable logfile" do |arg|
           opts[:logfile] = arg
         end
