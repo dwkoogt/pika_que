@@ -1,5 +1,5 @@
-require 'pika_que/worker'
-require 'pika_que/codecs/rails'
+require 'pika_que/rails_worker'
+require 'pika_que/util'
 
 module PikaQue
   class Rails < ::Rails::Engine
@@ -20,10 +20,10 @@ module PikaQue
     config.after_initialize do
       config_file = ::Rails.root.join('config').join('pika_que.yml')
       if File.exist? config_file
-        PIKA_QUE_CONFIG = YAML.load_file(config_file)
+        PIKA_QUE_CONFIG = YAML.load_file(config_file).deep_symbolize_keys
       else
         mailer_queue = (::Rails::VERSION::MAJOR < 5) ? ActionMailer::DeliveryJob.queue_name : ActionMailer::Base.deliver_later_queue_name
-        PIKA_QUE_CONFIG = { "processors" => [{ "workers" => [{ "queue" => ActiveJob::Base.queue_name }, { "queue" => mailer_queue.to_s }] }] }
+        PIKA_QUE_CONFIG = { processors: [{ workers: [{ queue: ActiveJob::Base.queue_name }, { queue: mailer_queue.to_s }] }] }
       end
 
       workers_dir = ::Rails.root.join('app').join('workers')
@@ -33,28 +33,26 @@ module PikaQue
         worker_files = []
       end
 
-      PIKA_QUE_CONFIG['processors'].each do |processor|
+      PIKA_QUE_CONFIG[:processors].each do |processor|
         workers = []
-        processor['workers'].each do |worker|
-          queue = worker['queue']
-          worker_name = worker['worker'] || "#{queue.underscore.classify}Worker"
-          Object.const_set(worker_name, Class.new do
-              include PikaQue::Worker
-              from_queue queue
-              config codec: PikaQue::Codecs::RAILS
-
-              def perform(msg)
-                ActiveJob::Base.execute msg
-                ack!
-              end
+        processor[:workers].each do |worker|
+          if worker[:worker]
+            worker_name = worker[:worker]
+          else
+            queue_name = worker[:queue_name] || worker[:queue]
+            queue_opts = worker[:queue_opts] || {}
+            worker_name = "#{queue_name.underscore.classify}Worker"
+            unless worker_files.detect{ |w| w =~ /#{worker_name.underscore}/ }
+              PikaQue::Util.register_worker_class(worker_name, PikaQue::RailsWorker, queue_name)
             end
-          ) unless worker_files.detect{ |w| w =~ /#{worker_name.underscore}/ }
+          end
           workers << worker_name
         end
-        proc_args = processor.symbolize_keys
-        proc_args[:workers] = workers
-        PikaQue.logger.info "Adding rails processor: #{proc_args}"
-        PikaQue.config.add_processor(proc_args)
+        processor[:workers] = workers
+        unless PikaQue.config[:workers]
+          PikaQue.logger.info "Adding rails processor: #{processor}"
+          PikaQue.config.add_processor(processor)
+        end
       end
     end
 
