@@ -11,7 +11,7 @@ module PikaQue
 
     def parse(args = ARGV)
       opts = parse_options(args)
-      config.merge!(opts)
+      init_config(opts)
       init_logger
       daemonize
       write_pid
@@ -24,6 +24,7 @@ module PikaQue
       PikaQue.middleware
 
       runner = Runner.new
+      runner.setup_processors
 
       begin
 
@@ -41,6 +42,13 @@ module PikaQue
 
     def config
       PikaQue.config
+    end
+
+    def init_config(opts)
+      if opts[:config]
+        config.load(File.expand_path(opts[:config]))
+      end
+      config.merge!(opts)
     end
 
     def init_logger
@@ -101,17 +109,6 @@ module PikaQue
       else
         require(File.expand_path(config[:require])) || raise(ArgumentError, 'require returned false')
       end
-
-      if config[:delay]
-        config.add_processor(config.delete(:delay_options))
-      else
-        config.delete(:delay_options)
-      end
-
-      if config[:workers]
-        config.add_processor({ workers: config.delete(:workers) })
-      end
-
     end
 
     def parse_options(args)
@@ -150,6 +147,10 @@ module PikaQue
 
         o.on '--no-delay', "turn off delay processor" do |arg|
           opts[:delay] = arg
+        end
+
+        o.on '-C', '--config PATH', "path to config yml file" do |arg|
+          opts[:config] = arg
         end
 
         o.on '-L', '--logfile PATH', "path to writable logfile" do |arg|

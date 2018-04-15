@@ -18,7 +18,7 @@ describe PikaQue::CLI do
   end
 
   describe '#run' do
-    let(:runner) { instance_double(PikaQue::Runner, run: nil, stop: nil) }
+    let(:runner) { instance_double(PikaQue::Runner, run: nil, stop: nil, setup_processors: nil) }
     before do
       allow(PikaQue::Runner).to receive(:new).and_return(runner)
       allow(PikaQue::Launcher).to receive(:launch).with(runner) { runner.run }
@@ -70,37 +70,6 @@ describe PikaQue::CLI do
       it 'should set log level to debug' do
         expect(PikaQue.logger).to receive(:level=).with(::Logger::DEBUG)
         cli.init_logger
-      end
-    end
-  end
-
-  describe '#load_app' do
-    context 'with defaults' do
-      it 'should add delay processor' do
-        expect(PikaQue.config).to receive(:add_processor).once
-        expect(PikaQue.config).to receive(:delete).with(:delay_options)
-        cli.load_app
-      end
-    end
-
-    context 'with defaults' do
-      before { PikaQue.config[:delay] = false }
-
-      it 'should not add delay processor' do
-        expect(PikaQue.config).to_not receive(:add_processor)
-        expect(PikaQue.config).to receive(:delete).with(:delay_options)
-        cli.load_app
-      end
-    end
-
-    context 'with workers' do
-      let(:worker) { double('Worker') }
-      before { PikaQue.config[:workers] = [worker] }
-
-      it 'should add worker processor' do
-        expect(PikaQue.config).to receive(:add_processor).twice
-        expect(PikaQue.config).to receive(:delete).twice
-        cli.load_app
       end
     end
   end

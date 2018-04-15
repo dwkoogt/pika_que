@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'yaml'
 
 require 'pika_que/codecs/json'
 require 'pika_que/codecs/noop'
@@ -81,6 +82,12 @@ module PikaQue
       @config[:vhost] = AMQ::Settings.parse_amqp_url(@config[:amqp]).fetch(:vhost, '/')
     end
 
+    def load(filename)
+      loaded = YAML.load_file(filename)
+      converted = JSON.parse(JSON.dump(loaded), symbolize_names: true)
+      merge! converted
+    end
+
     def merge!(other = {})
       @config = deep_merge(@config, other)
     end
@@ -95,17 +102,6 @@ module PikaQue
     def deep_merge(first, second)
       merger = proc { |_, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }
       first.merge(second, &merger)
-    end
-
-    def processor(opts = {})
-      {
-        :processor        => PikaQue::Processor,
-        :workers          => []
-      }.merge(opts)
-    end
-
-    def add_processor(opts = {})
-      @config[:processors] << processor(opts)
     end
 
   end

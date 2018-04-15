@@ -33,10 +33,11 @@ class LowPriorityWorker
 
 end
 
-PikaQue.config.add_processor(workers: [LowPriorityWorker], concurrency: 10)
-PikaQue.config.add_processor(workers: [HighPriorityWorker], concurrency: 10)
+PikaQue.config[:processors] << { workers: [LowPriorityWorker], concurrency: 10 }
+PikaQue.config[:processors] << { workers: [HighPriorityWorker], concurrency: 10 }
 
 runner = PikaQue::Runner.new
+runner.setup_processors
 
 begin
   runner.run

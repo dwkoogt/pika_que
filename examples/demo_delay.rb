@@ -16,10 +16,11 @@ end
 
 PikaQue.logger.level = ::Logger::DEBUG
 
-PikaQue.config.add_processor(PikaQue.config.delete(:delay_options))
-PikaQue.config.add_processor(workers: [DemoWorker])
+PikaQue.config[:processors] << PikaQue.config[:delay_options]
+PikaQue.config[:processors] << { workers: [DemoWorker] }
 
 runner = PikaQue::Runner.new
+runner.setup_processors
 
 begin
   runner.run

@@ -50,37 +50,4 @@ describe PikaQue::Configuration do
       expect(merged[:exchange_options][:type]).to eq :fanout
     end
   end
-
-  describe '#processor' do
-    let(:config) { described_class.new }
-
-    context 'with defaults' do
-      let(:processor) { config.processor({}) }
-
-      it 'should have defaults' do
-        expect(processor[:processor]).to eq PikaQue::Processor
-        expect(processor[:workers]).to eq []
-      end
-    end
-
-    context 'with args' do
-      let(:processor) { config.processor({ processor: 'Foo::Bar', workers: ['FooWorker','BarWorker'] }) }
-
-      it 'should have defaults' do
-        expect(processor[:processor]).to eq 'Foo::Bar'
-        expect(processor[:workers]).to eq ['FooWorker','BarWorker']
-      end
-    end
-  end
-
-  describe '#add_processor' do
-    let(:config) { described_class.new }
-    before { config.add_processor({ processor: 'Foo::Bar', workers: ['FooWorker','BarWorker'] }) }
-
-    it 'should have added processor' do
-      expect(config[:processors].empty?).to be_falsey
-      expect(config[:processors].first[:processor]).to eq 'Foo::Bar'
-      expect(config[:processors].first[:workers]).to eq ['FooWorker','BarWorker']
-    end
-  end
 end

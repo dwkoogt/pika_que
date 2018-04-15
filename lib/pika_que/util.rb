@@ -1,3 +1,5 @@
+require "dry/inflector"
+
 module PikaQue
   module Util
     extend self
@@ -20,6 +22,27 @@ module PikaQue
           config local_config if local_config.any?
         end
       )
+    end
+
+    def worker_classes(workers = [])
+      return [] if workers.nil?
+      
+      workers.map do |worker|
+        if worker.is_a? Hash
+          if worker[:worker]
+            worker[:worker]
+          else
+            queue_name = worker[:queue_name] || worker[:queue]
+            "#{inflector.classify(inflector.underscore(queue_name))}Worker"
+          end
+        else
+          worker
+        end
+      end
+    end
+
+    def inflector
+      @inflector ||= Dry::Inflector.new
     end
 
   end

@@ -49,9 +49,9 @@ module PikaQue
           workers << worker_name
         end
         processor[:workers] = workers
-        unless PikaQue.config[:workers]
+        unless PikaQue.config[:workers] || PikaQue.config[:config]
           PikaQue.logger.info "Adding rails processor: #{processor}"
-          PikaQue.config.add_processor(processor)
+          PikaQue.config[:processors] << processor
         end
       end
     end
