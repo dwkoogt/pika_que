@@ -141,7 +141,7 @@ describe PikaQue::Handlers::RetryHandler do
         it 'should publish to retry exchange with count 1' do
           expect(PikaQue.logger).to receive(:info).with('RetryHandler msg=retrying, count=1, headers={}')
           expect(handler).to receive(:publish_retry).with(delivery_info, "msg", { backoff: 60, count: 1 })
-          expect(main_channel).to receive(:reject).with('tag', false)
+          expect(main_channel).to receive(:acknowledge).with('tag', false)
           handler.send :handle_retry, main_channel, delivery_info, {}, "msg", :reject
         end
       end
@@ -150,7 +150,7 @@ describe PikaQue::Handlers::RetryHandler do
         it 'should publish to retry exchange with count 2' do
           expect(PikaQue.logger).to receive(:info).with('RetryHandler msg=retrying, count=2, headers={"count"=>1}')
           expect(handler).to receive(:publish_retry).with(delivery_info, "msg", { backoff: 60, count: 2 })
-          expect(main_channel).to receive(:reject).with('tag', false)
+          expect(main_channel).to receive(:acknowledge).with('tag', false)
           handler.send :handle_retry, main_channel, delivery_info, { headers: { 'count' => 1 } }, "msg", :reject
         end
       end
@@ -159,7 +159,7 @@ describe PikaQue::Handlers::RetryHandler do
         it 'should publish to error exchange' do
           expect(PikaQue.logger).to receive(:info).with('RetryHandler msg=failing, retried_count=2, headers={"count"=>2}, reason=reject')
           expect(handler).to receive(:publish_error).with(delivery_info, "msg")
-          expect(main_channel).to receive(:reject).with('tag', false)
+          expect(main_channel).to receive(:acknowledge).with('tag', false)
           handler.send :handle_retry, main_channel, delivery_info, { headers: { 'count' => 2 } }, "msg", :reject
         end
       end
@@ -172,7 +172,7 @@ describe PikaQue::Handlers::RetryHandler do
         it 'should publish to retry exchange with count 1' do
           expect(PikaQue.logger).to receive(:info).with('RetryHandler msg=retrying, count=1, headers={}')
           expect(handler).to receive(:publish_retry).with(delivery_info, "msg", { backoff: 60, count: 1 })
-          expect(main_channel).to receive(:reject).with('tag', false)
+          expect(main_channel).to receive(:acknowledge).with('tag', false)
           handler.send :handle_retry, main_channel, delivery_info, {}, "msg", :reject
         end
       end
@@ -181,7 +181,7 @@ describe PikaQue::Handlers::RetryHandler do
         it 'should publish to retry exchange with count 2' do
           expect(PikaQue.logger).to receive(:info).with('RetryHandler msg=retrying, count=2, headers={"count"=>1}')
           expect(handler).to receive(:publish_retry).with(delivery_info, "msg", { backoff: 120, count: 2 })
-          expect(main_channel).to receive(:reject).with('tag', false)
+          expect(main_channel).to receive(:acknowledge).with('tag', false)
           handler.send :handle_retry, main_channel, delivery_info, { headers: { 'count' => 1 } }, "msg", :reject
         end
       end
@@ -190,7 +190,7 @@ describe PikaQue::Handlers::RetryHandler do
         it 'should publish to error exchange' do
           expect(PikaQue.logger).to receive(:info).with('RetryHandler msg=failing, retried_count=2, headers={"count"=>2}, reason=reject')
           expect(handler).to receive(:publish_error).with(delivery_info, "msg")
-          expect(main_channel).to receive(:reject).with('tag', false)
+          expect(main_channel).to receive(:acknowledge).with('tag', false)
           handler.send :handle_retry, main_channel, delivery_info, { headers: { 'count' => 2 } }, "msg", :reject
         end
       end

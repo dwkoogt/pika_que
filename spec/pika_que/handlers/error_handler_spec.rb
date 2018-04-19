@@ -44,7 +44,7 @@ describe PikaQue::Handlers::ErrorHandler do
 
     it 'should publish to error queue with error' do
       expect(handler).to receive(:publish).with(delivery_info, "msg")
-      expect(main_channel).to receive(:reject).with('tag', false)
+      expect(main_channel).to receive(:acknowledge).with('tag', false)
       handler.handle(:error, main_channel, delivery_info, {}, "msg", RuntimeError)
     end
   end
