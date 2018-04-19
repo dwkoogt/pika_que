@@ -36,15 +36,19 @@ module PikaQue
       PIKA_QUE_CONFIG[:processors].each do |processor|
         workers = []
         processor[:workers].each do |worker|
-          if worker[:worker]
-            worker_name = worker[:worker]
-          else
-            queue_name = worker[:queue_name] || worker[:queue]
-            queue_opts = worker[:queue_opts] || {}
-            worker_name = "#{queue_name.underscore.classify}Worker"
-            unless worker_files.detect{ |w| w =~ /#{worker_name.underscore}/ }
-              PikaQue::Util.register_worker_class(worker_name, PikaQue::RailsWorker, queue_name)
+          if worker.is_a? Hash
+            if worker[:worker]
+              worker_name = worker[:worker]
+            else
+              queue_name = worker[:queue_name] || worker[:queue]
+              queue_opts = worker[:queue_opts] || {}
+              worker_name = "#{queue_name.underscore.classify}Worker"
+              unless worker_files.detect{ |w| w =~ /#{worker_name.underscore}/ }
+                PikaQue::Util.register_worker_class(worker_name, PikaQue::RailsWorker, queue_name, queue_opts)
+              end
             end
+          else
+            worker_name = worker
           end
           workers << worker_name
         end
