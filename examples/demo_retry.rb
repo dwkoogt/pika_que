@@ -1,4 +1,6 @@
 # > bundle exec ruby examples/demo_retry.rb
+# Retry with routing to a headers exchange
+# Select between constant backoff and exponential backoff modes
 require 'pika_que'
 require 'pika_que/worker'
 require 'pika_que/handlers/retry_handler'
