@@ -3,19 +3,22 @@ module PikaQue
     class ErrorHandler
 
       DEFAULT_ERROR_OPTS = {
-        :exchange     => 'pika-que-error',
-        :exchange_options => { :type => :topic },
-        :queue        => 'pika-que-error',
-        :routing_key  => '#'
+        :error_prefix => 'pika-que'
       }.freeze
      
       def initialize(opts = {})
         @opts = PikaQue.config.merge(DEFAULT_ERROR_OPTS).merge(opts)
         @connection = @opts[:connection] || PikaQue.connection
         @channel = @connection.create_channel
-        @exchange = @channel.exchange(@opts[:exchange], type: exchange_type, durable: exchange_durable?)
-        @queue = @channel.queue(@opts[:queue], durable: queue_durable?)
-        @queue.bind(@exchange, routing_key: @opts[:routing_key])
+        error_ex_name = error_q_name = "#{@opts[:error_prefix]}-error"
+        if @opts[:queue]
+          # handle deprecated options
+          error_ex_name = @opts[:exchange]
+          error_q_name = @opts[:queue]
+        end
+        @exchange = @channel.exchange(error_ex_name, type: :topic, durable: exchange_durable?)
+        @queue = @channel.queue(error_q_name, durable: queue_durable?)
+        @queue.bind(@exchange, routing_key: '#')
         @monitor = Monitor.new
       end
 
@@ -52,10 +55,6 @@ module PikaQue
 
       def exchange_durable?
         @opts.fetch(:exchange_options, {}).fetch(:durable, false)
-      end
-
-      def exchange_type
-        @opts.fetch(:exchange_options, {}).fetch(:type, :topic)
       end
 
       def publish(delivery_info, msg)
