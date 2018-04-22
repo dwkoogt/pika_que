@@ -42,14 +42,16 @@ module PikaQue
   end
 
   def self.reporters
-    config[:reporters] << PikaQue::Reporters::LogReporter.new if config[:reporters].empty?
-    config[:reporters]
+    @reporters ||= [PikaQue::Reporters::LogReporter.new]
+    yield @reporters if block_given?
+    @reporters
   end
 
   def self.reset!
     @config = nil
     @connection = nil
     @chain = nil
+    @reporters = nil
   end
 
 end

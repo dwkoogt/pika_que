@@ -6,12 +6,12 @@ require 'pika_que/publisher'
 
 require 'dev_worker'
 require 'demo_worker'
-require 'demo_reporter'
+require 'demo_middleware'
 
 PikaQue.logger.level = ::Logger::DEBUG
 
 PikaQue.middleware do |chain|
-  chain.add DemoReporter
+  chain.add DemoMiddleware
 end
 
 workers = [DemoWorker,DevWorker]

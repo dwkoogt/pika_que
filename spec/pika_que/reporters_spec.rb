@@ -15,7 +15,7 @@ describe PikaQue::Reporters do
 
     context 'report' do
       let(:reporter) { double('Reporter') }
-      before { PikaQue.config[:reporters] << reporter }
+      before { PikaQue.reporters << reporter }
 
       it 'should call report on reporter' do
         expect(reporter).to receive(:report).with(err, Object, 'msg')
@@ -25,7 +25,7 @@ describe PikaQue::Reporters do
 
     context 'error' do
       let(:reporter) { double('Reporter') }
-      before { PikaQue.config[:reporters] << reporter }
+      before { PikaQue.reporters << reporter }
       before { allow(reporter).to receive(:report).and_raise('Boom!') }
 
       it 'should catch error and log on error' do

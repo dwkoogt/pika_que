@@ -68,10 +68,10 @@ describe PikaQue do
 
     context 'configured reporter' do
       let(:reporter) { double('Reporter') }
-      before { described_class.config[:reporters] << reporter }
+      before { described_class.reporters << reporter }
 
       it 'should include configured reporter' do
-        expect(described_class.reporters.first).to be(reporter)
+        expect(described_class.reporters.last).to be(reporter)
       end
     end
     

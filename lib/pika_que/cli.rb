@@ -20,11 +20,9 @@ module PikaQue
     def run
 
       load_app
+      prepare_server
 
-      PikaQue.middleware
-
-      runner = Runner.new
-      runner.setup_processors
+      runner = Runner.new.tap{ |r| r.setup_processors }
 
       begin
 
@@ -108,6 +106,16 @@ module PikaQue
         end
       else
         require(File.expand_path(config[:require])) || raise(ArgumentError, 'require returned false')
+      end
+    end
+
+    def prepare_server
+      PikaQue.middleware do |chain|
+        config[:middlewares].each{ |m| chain.add PikaQue::Util.constantize(m) } if config[:middlewares]
+      end
+
+      PikaQue.reporters do |rptrs|
+        config[:reporters].each{ |r| rptrs << PikaQue::Util.constantize(r).new }
       end
     end
 
