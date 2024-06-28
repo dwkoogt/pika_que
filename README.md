@@ -1,6 +1,6 @@
 # PikaQue
 
-![Build Status](https://travis-ci.org/dwkoogt/pika_que.svg?branch=master)
+![example workflow](https://github.com/github/pika_que/actions/workflows/ruby.yml/badge.svg)
 
 A RabbitMQ background processing framework for Ruby with built-in support for Rails integration.
 
