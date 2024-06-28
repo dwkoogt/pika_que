@@ -9,7 +9,6 @@ module PikaQue
       # and following queue
       # pika-que-retry-60 (with default backoff)
       #
-      # retry_mode can be either :exp or :const
 
       DEFAULT_RETRY_OPTS = {
         :retry_prefix             => 'pika-que',
